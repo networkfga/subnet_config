@@ -75,13 +75,71 @@ $ sudo ifup <interface>
 ```
 Feito isso, verifique que as configurações foram redefinidas em sua interface utilizando o comando ```$ ifconfig```
 
-# Servidor DHCP
+# Servidor DHCP e DNS
 
-# DNS 
+O primeiro passo para configurar o servidor DHCP é baixar o pacote ```isc-dhcp-server```, para isso execute a seguinte linha de comando:
+```shell
+$ sudo apt-get install isc-dhcp-server
+```
+
+Após a instalação deve-se configurar o arquivo localizado em ```/etc/dhcp/dhcpd.conf```, abra-o e insira as seguintes linhas de configurações:
+
+```shell
+authoritative;
+
+option domain-name "lds-teste.com"
+option domain-name-servers 8.8.8.8, 8.8.4.4, IP_DNS1, IP_DNS2;
+
+subnet 10.0.0.0 netmask 255.255.0.0 {
+    range 10.0.0.1 10.0.0.20
+    option routers 10.0.0.1
+}
+```
+
+Após a configuração anterior, abra o arquivo de interface padrão de DHCP, ele fica localizado em ```/etc/default/isc-dhcp-server``` e adicione a seguinte linha a ele:
+
+```shell
+INTERFACES="interfaceLAN"
+```
+
+Desative o serviço de DHCP
+```shell
+$ sudo service isc-dhcp-server stop
+```
+Ative-o novamente 
+```shell
+$ sudo service isc-dhcp-server start
+```
+Verifique o status, se foi possível subir o servidor DHCP
+```shell
+$ sudo service isc-dhcp-server status
+```
+O Log do comando anterior pode ser exemplificado da seguinte forma:
+```shell
+● isc-dhcp-server.service - ISC DHCP IPv4 server
+   Loaded: loaded (/lib/systemd/system/isc-dhcp-server.service; enabled; vendor preset: enabled)
+   Active: active (running) since Qua 2017-10-18 14:08:03 BRST; 1h 17min ago
+     Docs: man:dhcpd(8)
+ Main PID: 6006 (dhcpd)
+   CGroup: /system.slice/isc-dhcp-server.service
+           └─6006 dhcpd -user dhcpd -group dhcpd -f -4 -pf /run/dhcp-server/dhcpd.pid -cf /etc/dhcp/dhcpd.conf enp1s0
+
+Out 18 14:23:05 Hornet dhcpd[6006]: DHCPREQUEST for 10.0.0.4 (10.0.0.1) from 74:e5:43:aa:ad:bf (pedro-Aspire-E1-571) via e
+Out 18 14:23:05 Hornet dhcpd[6006]: DHCPACK on 10.0.0.4 to 74:e5:43:aa:ad:bf (pedro-Aspire-E1-571) via enp1s0
+Out 18 14:25:43 Hornet dhcpd[6006]: DHCPREQUEST for 192.168.0.10 from 88:79:7e:ca:ef:fe via enp1s0: wrong network.
+Out 18 14:25:43 Hornet dhcpd[6006]: DHCPNAK on 192.168.0.10 to 88:79:7e:ca:ef:fe via enp1s0
+Out 18 14:25:48 Hornet dhcpd[6006]: DHCPREQUEST for 192.168.0.10 from 88:79:7e:ca:ef:fe via enp1s0: wrong network.
+Out 18 14:25:48 Hornet dhcpd[6006]: DHCPNAK on 192.168.0.10 to 88:79:7e:ca:ef:fe via enp1s0
+Out 18 14:25:48 Hornet dhcpd[6006]: DHCPDISCOVER from 88:79:7e:ca:ef:fe via enp1s0
+Out 18 14:25:49 Hornet dhcpd[6006]: DHCPOFFER on 10.0.0.5 to 88:79:7e:ca:ef:fe (android-57948af2d739f5aa) via enp1s0
+Out 18 14:25:51 Hornet dhcpd[6006]: DHCPREQUEST for 10.0.0.5 (10.0.0.1) from 88:79:7e:ca:ef:fe (android-57948af2d739f5aa) 
+Out 18 14:25:51 Hornet dhcpd[6006]: DHCPACK on 10.0.0.5 to 88:79:7e:ca:ef:fe (android-57948af2d739f5aa) via enp1s0
+lines 1-18/18 (END)
+```
 
 # NAT
 
-Para que as configurações de rede privada criadas na interface de rede, e os computadores clientes possam acessar a Internet é necessário que configure-se as Tabelas de IP através do NAT. Esse procedimento deve ser executado toda vez que o Servidor for reiniciado, caso o script no seja inicializado com o sistema.
+Para que as configurações de rede privada criadas na interface de rede, e os computadores clientes possam acessar a Internet é necessário que configure-se as Tabelas de IP através do NAT. Esse procedimento deve ser executado toda vez que o Servidor for reiniciado, caso o script não seja inicializado com o sistema.
 
 Primeiro crie um arquivo shell:
 ```shell
