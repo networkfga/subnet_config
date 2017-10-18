@@ -80,3 +80,22 @@ Feito isso, verifique que as configurações foram redefinidas em sua interface 
 # DNS 
 
 # NAT
+
+Para que as configurações de rede privada criadas na interface de rede, e os computadores clientes possam acessar a Internet é necessário que configure-se as Tabelas de IP através do NAT. Esse procedimento deve ser executado toda vez que o Servidor for reiniciado, caso o script no seja inicializado com o sistema.
+
+Primeiro crie um arquivo shell:
+```shell
+$ touch nat.sh
+```
+Dê as permissões para que ele possa ser executado:
+```shell
+$ sudo chmod +x nat.sh
+```
+Agora edite o arquivo ```nat.sh``` da seguinte maneira:
+
+```shell
+sudo iptables -X
+sudo iptables -F
+sudo echo 1 > /proc/sys/net/ipv4/ip_forward
+sudo iptables -t nat -A POSTROUTING -o <interfaceWAN> -j MASQUERADE
+```
