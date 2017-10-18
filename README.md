@@ -55,16 +55,25 @@ wlp3s0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
         TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
 ```
 
-Após verificar sua interface, abra o arquivo ```/etc/network/interfaces``` e insira as configurações para sua interface de rede.
+Após verificar sua interface, abra o arquivo ```/etc/network/interfaces```, como superusuário e insira as configurações para sua interface de rede.
 
 ```shell
 # Network Interface
-allow-hotplug enp1s0
-iface enp1s0 inet static
+allow-hotplug <interface>
+iface <interface> inet static
 address 10.0.0.1
 netmask 255.255.0.0
 ```
 
+Para verificar se tal configuração foi feita corretamente utilize os comandos:
+
+```
+# Desabilita a interface de rede
+$ sudo ifdown <interface>
+# Habilita a interface de rede
+$ sudo ifup <interface>
+```
+Feito isso, verifique que as configurações foram redefinidas em sua interface utilizando o comando ```$ ifconfig```
 
 # Servidor DHCP
 
